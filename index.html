@@ -18,4 +18,962 @@
     --neon-pink: #ff0055;
     --neon-yellow: #fcee0a;
     --neon-green: #39ff14;
-   
+    --danger: #ff2a2a;
+    --font-display: 'Orbitron', 'Rajdhani', sans-serif;
+    --font-mono: 'Fira Code', 'Courier New', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    font-family: var(--font-mono);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* CRT Scanline Effect */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.15),
+      rgba(0, 0, 0, 0.15) 1px,
+      transparent 1px,
+      transparent 2px
+    );
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.6;
+  }
+
+  /* Cyber Grid Background */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .app {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 0;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    background: var(--bg-2);
+    border-right: 1px solid var(--neon-cyan);
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    box-shadow: 4px 0 20px rgba(0, 243, 255, 0.05);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    padding: 8px 4px;
+    color: var(--text);
+    text-transform: uppercase;
+  }
+
+  .logo .icon {
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: 2px solid var(--neon-cyan);
+    display: grid;
+    place-items: center;
+    color: var(--neon-cyan);
+    font-size: 20px;
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.3), inset 0 0 10px rgba(0, 243, 255, 0.1);
+    clip-path: polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%);
+  }
+
+  .logo span b { color: var(--neon-cyan); text-shadow: 0 0 8px var(--neon-cyan); }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--neon-pink);
+    padding: 8px 6px 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+
+  .section-title button {
+    background: transparent;
+    border: 1px solid var(--neon-pink);
+    color: var(--neon-pink);
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 700;
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    transition: all 0.2s;
+  }
+
+  .section-title button:hover {
+    background: var(--neon-pink);
+    color: var(--bg);
+    box-shadow: 0 0 10px var(--neon-pink);
+  }
+
+  .folder-list { display: flex; flex-direction: column; gap: 4px; }
+
+  .folder-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 13px;
+    transition: all 0.2s;
+    position: relative;
+    border-left: 2px solid transparent;
+  }
+
+  .folder-item:hover {
+    background: rgba(0, 243, 255, 0.05);
+    color: var(--neon-cyan);
+  }
+
+  .folder-item.active {
+    background: linear-gradient(90deg, rgba(0, 243, 255, 0.1), transparent);
+    color: var(--neon-cyan);
+    border-left: 2px solid var(--neon-cyan);
+    text-shadow: 0 0 5px rgba(0, 243, 255, 0.5);
+  }
+
+  .folder-item .count {
+    margin-left: auto;
+    background: var(--card-2);
+    padding: 2px 8px;
+    font-size: 11px;
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+
+  .folder-item.active .count {
+    background: rgba(0, 243, 255, 0.15);
+    color: var(--neon-cyan);
+    border-color: var(--neon-cyan);
+  }
+
+  .folder-item .del {
+    display: none;
+    position: absolute;
+    right: 10px;
+    color: var(--danger);
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  .folder-item:hover .del { display: inline; }
+  .folder-item:hover .count { display: none; }
+
+  .io-buttons {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .btn {
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    cursor: pointer;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+    transition: all 0.2s;
+    clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  }
+
+  .btn-primary {
+    background: rgba(0, 243, 255, 0.1);
+    border-color: var(--neon-cyan);
+    color: var(--neon-cyan);
+  }
+
+  .btn-primary:hover {
+    background: var(--neon-cyan);
+    color: var(--bg);
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--neon-pink);
+    color: var(--neon-pink);
+    box-shadow: 0 0 10px rgba(255, 0, 85, 0.2);
+  }
+
+  /* MAIN */
+  .main { padding: 24px 32px; overflow-y: auto; }
+
+  .topbar {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .search {
+    flex: 1;
+    min-width: 220px;
+    position: relative;
+  }
+
+  .search input {
+    width: 100%;
+    padding: 12px 14px 12px 40px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--neon-cyan);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s;
+  }
+
+  .search input:focus {
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.15), inset 0 0 5px rgba(0, 243, 255, 0.05);
+  }
+
+  .search input::placeholder { color: var(--muted); }
+
+  .search::before {
+    content: "▶";
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: var(--neon-cyan);
+    opacity: 0.7;
+  }
+
+  .tag-filter { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+  .tag-chip {
+    padding: 6px 14px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: lowercase;
+  }
+
+  .tag-chip::before { content: "#"; opacity: 0.5; }
+
+  .tag-chip:hover {
+    color: var(--neon-yellow);
+    border-color: var(--neon-yellow);
+    box-shadow: 0 0 8px rgba(252, 238, 10, 0.2);
+  }
+
+  .tag-chip.active {
+    background: rgba(252, 238, 10, 0.15);
+    color: var(--neon-yellow);
+    border-color: var(--neon-yellow);
+    font-weight: 600;
+    box-shadow: 0 0 10px rgba(252, 238, 10, 0.3);
+  }
+
+  .prompt-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 20px;
+  }
+
+  .prompt-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Corner accents for cards */
+  .prompt-card::before, .prompt-card::after {
+    content: "";
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border: 2px solid var(--neon-cyan);
+    transition: all 0.3s;
+    opacity: 0.5;
+  }
+  .prompt-card::before { top: 0; left: 0; border-right: 0; border-bottom: 0; }
+  .prompt-card::after { bottom: 0; right: 0; border-left: 0; border-top: 0; }
+
+  .prompt-card:hover {
+    border-color: var(--neon-cyan);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 243, 255, 0.15);
+  }
+
+  .prompt-card:hover::before, .prompt-card:hover::after {
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+  }
+
+  .prompt-title {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: 0.5px;
+  }
+
+  .prompt-title .folder-badge {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    background: rgba(0, 243, 255, 0.1);
+    color: var(--neon-cyan);
+    padding: 2px 8px;
+    border: 1px solid rgba(0, 243, 255, 0.3);
+    text-transform: uppercase;
+  }
+
+  .prompt-content {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+    max-height: 140px;
+    overflow: hidden;
+    position: relative;
+    background: var(--bg-2);
+    padding: 12px;
+    border-left: 2px solid var(--neon-pink);
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: var(--font-mono);
+  }
+
+  .prompt-content a {
+    color: var(--neon-cyan);
+    text-decoration: none;
+    border-bottom: 1px dashed var(--neon-cyan);
+    transition: all 0.2s;
+  }
+
+  .prompt-content a:hover {
+    color: var(--neon-yellow);
+    border-color: var(--neon-yellow);
+    text-shadow: 0 0 5px var(--neon-yellow);
+  }
+
+  .prompt-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .prompt-tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 3px 8px;
+    background: rgba(57, 255, 20, 0.05);
+    color: var(--neon-green);
+    border: 1px solid rgba(57, 255, 20, 0.3);
+    text-transform: lowercase;
+  }
+
+  .prompt-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .icon-btn {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: var(--font-display);
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .icon-btn:hover {
+    background: var(--card-2);
+    color: var(--text);
+    border-color: var(--text);
+  }
+
+  .icon-btn.copy:hover {
+    color: var(--neon-green);
+    border-color: var(--neon-green);
+    box-shadow: 0 0 8px rgba(57, 255, 20, 0.2);
+  }
+
+  .icon-btn.del:hover {
+    color: var(--danger);
+    border-color: var(--danger);
+    box-shadow: 0 0 8px rgba(255, 42, 42, 0.2);
+  }
+
+  .empty {
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--muted);
+    grid-column: 1 / -1;
+    border: 1px dashed var(--border);
+    background: rgba(15, 15, 26, 0.5);
+  }
+
+  .empty .big { font-size: 48px; margin-bottom: 12px; opacity: 0.3; }
+
+  /* MODAL */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 5, 8, 0.85);
+    backdrop-filter: blur(8px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 20px;
+  }
+
+  .modal-backdrop.show { display: flex; }
+
+  .modal {
+    background: var(--bg-2);
+    border: 1px solid var(--neon-cyan);
+    width: 100%;
+    max-width: 600px;
+    padding: 28px;
+    box-shadow: 0 0 40px rgba(0, 243, 255, 0.15), inset 0 0 20px rgba(0, 243, 255, 0.05);
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+  }
+
+  /* Modal corner decorations */
+  .modal::before {
+    content: "SYSTEM_OVERRIDE";
+    position: absolute;
+    top: -10px;
+    left: 20px;
+    background: var(--bg-2);
+    padding: 0 10px;
+    font-family: var(--font-display);
+    font-size: 10px;
+    color: var(--neon-cyan);
+    letter-spacing: 2px;
+  }
+
+  .modal h2 {
+    font-family: var(--font-display);
+    color: var(--text);
+    font-size: 20px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .modal h2::before {
+    content: "";
+    width: 4px;
+    height: 24px;
+    background: var(--neon-pink);
+    box-shadow: 0 0 10px var(--neon-pink);
+  }
+
+  .form-group { margin-bottom: 18px; }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 11px;
+    color: var(--neon-cyan);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+  }
+
+  .form-group input, .form-group textarea, .form-group select {
+    width: 100%;
+    padding: 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s;
+  }
+
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.15);
+  }
+
+  .form-group textarea {
+    min-height: 160px;
+    resize: vertical;
+    line-height: 1.6;
+  }
+
+  .form-group .hint {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+    font-style: italic;
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 28px;
+    justify-content: flex-end;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--bg-2);
+    border: 1px solid var(--neon-green);
+    color: var(--neon-green);
+    padding: 14px 24px;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 1px;
+    z-index: 200;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 0 20px rgba(57, 255, 20, 0.2);
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  }
+
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.error {
+    border-color: var(--danger);
+    color: var(--danger);
+    box-shadow: 0 0 20px rgba(255, 42, 42, 0.2);
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--neon-cyan); }
+
+  @media (max-width: 768px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar { position: relative; height: auto; border-right: none; border-bottom: 1px solid var(--neon-cyan); }
+    .main { padding: 16px; }
+    .prompt-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="icon">⚡</div>
+      <span>Prompt<b>Vault</b></span>
+    </div>
+
+    <div>
+      <div class="section-title">
+        <span>// THƯ_MỤC</span>
+        <button onclick="openFolderModal()" title="Thêm thư mục">+</button>
+      </div>
+      <div class="folder-list" id="folderList"></div>
+    </div>
+
+    <div class="io-buttons">
+      <button class="btn btn-primary" onclick="openPromptModal()">＋ KHỞI_TẠO_PROMPT</button>
+      <button class="btn btn-ghost" onclick="exportData()">⬇ XUẤT_JSON</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('importFile').click()">⬆ NHẬP_JSON</button>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)"/>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div class="search">
+        <input type="text" id="searchInput" placeholder="TÌM_KIẾM_DỮ_LIỆU..." oninput="render()"/>
+      </div>
+    </div>
+    <div class="tag-filter" id="tagFilter"></div>
+    <div style="height:20px"></div>
+    <div class="prompt-grid" id="promptGrid"></div>
+  </main>
+</div>
+
+<!-- MODAL PROMPT -->
+<div class="modal-backdrop" id="promptModal">
+  <div class="modal">
+    <h2 id="promptModalTitle">KHỞI_TẠO_PROMPT</h2>
+    <div class="form-group">
+      <label>Tên_Định_Danh</label>
+      <input type="text" id="pName" placeholder="VD: TOM_TAT_BAI_VIET"/>
+    </div>
+    <div class="form-group">
+      <label>Phân_Loại</label>
+      <select id="pFolder"></select>
+    </div>
+    <div class="form-group">
+      <label>Dữ_Liệu_Nguồn</label>
+      <textarea id="pContent" placeholder="Nhập nội dung prompt. Link sẽ tự động nhận diện (https://...)"></textarea>
+      <div class="hint">> Hệ thống sẽ tự động mã hóa liên kết HTTP/HTTPS.</div>
+    </div>
+    <div class="form-group">
+      <label>Thẻ_Meta</label>
+      <input type="text" id="pTags" placeholder="coding, writing, gpt4 (cách nhau bởi dấu phẩy)"/>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('promptModal')">HỦY_BỎ</button>
+      <button class="btn btn-primary" onclick="savePrompt()">LƯU_DỮ_LIỆU</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FOLDER -->
+<div class="modal-backdrop" id="folderModal">
+  <div class="modal">
+    <h2>KHỞI_TẠO_THƯ_MỤC</h2>
+    <div class="form-group">
+      <label>Tên_Thư_Mục</label>
+      <input type="text" id="fName" placeholder="VD: MARKETING, CODE, VIET_LACH..."/>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('folderModal')">HỦY_BỎ</button>
+      <button class="btn btn-primary" onclick="saveFolder()">THỰC_THI</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ DATA ============ */
+const STORAGE_KEY = 'promptVault_cyber_v1';
+let state = {
+  folders: [],
+  prompts: [],
+  activeFolder: 'all',
+  activeTag: null,
+  editingId: null
+};
+
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function load(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const d = JSON.parse(raw);
+      state.folders = d.folders || [];
+      state.prompts = d.prompts || [];
+    }
+    if(state.folders.length===0){
+      state.folders = [
+        {id:uid(), name:'TỔNG_HỢP'},
+        {id:uid(), name:'MÃ_NGUỒN'},
+        {id:uid(), name:'VIẾT_LÁCH'}
+      ];
+      save();
+    }
+  }catch(e){console.error(e)}
+}
+function save(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    folders:state.folders, prompts:state.prompts
+  }));
+}
+
+/* ============ RENDER ============ */
+function render(){
+  renderFolders();
+  renderTags();
+  renderPrompts();
+}
+
+function renderFolders(){
+  const list = document.getElementById('folderList');
+  const allCount = state.prompts.length;
+  let html = `<div class="folder-item ${state.activeFolder==='all'?'active':''}" onclick="selectFolder('all')">
+    <span>[*]</span><span>TẤT_CẢ</span><span class="count">${allCount}</span>
+  </div>`;
+  state.folders.forEach(f=>{
+    const c = state.prompts.filter(p=>p.folderId===f.id).length;
+    html += `<div class="folder-item ${state.activeFolder===f.id?'active':''}" onclick="selectFolder('${f.id}')">
+      <span>[>]</span><span>${escapeHtml(f.name)}</span>
+      <span class="count">${c}</span>
+      <span class="del" onclick="event.stopPropagation();deleteFolder('${f.id}')" title="Xóa">✕</span>
+    </div>`;
+  });
+  list.innerHTML = html;
+}
+
+function renderTags(){
+  const allTags = new Set();
+  state.prompts.forEach(p=>(p.tags||[]).forEach(t=>allTags.add(t)));
+  const container = document.getElementById('tagFilter');
+  if(allTags.size===0){container.innerHTML='';return}
+  let html = `<span class="tag-chip ${state.activeTag===null?'active':''}" onclick="filterTag(null)">TẤT_CẢ</span>`;
+  [...allTags].sort().forEach(t=>{
+    html += `<span class="tag-chip ${state.activeTag===t?'active':''}" onclick="filterTag('${escapeAttr(t)}')">${escapeHtml(t)}</span>`;
+  });
+  container.innerHTML = html;
+}
+
+function renderPrompts(){
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  let list = state.prompts.slice();
+  if(state.activeFolder!=='all') list = list.filter(p=>p.folderId===state.activeFolder);
+  if(state.activeTag) list = list.filter(p=>(p.tags||[]).includes(state.activeTag));
+  if(q) list = list.filter(p=>
+    p.name.toLowerCase().includes(q) ||
+    p.content.toLowerCase().includes(q) ||
+    (p.tags||[]).some(t=>t.toLowerCase().includes(q))
+  );
+  list.sort((a,b)=>(b.updatedAt||b.createdAt)-(a.updatedAt||a.createdAt));
+
+  const grid = document.getElementById('promptGrid');
+  if(list.length===0){
+    grid.innerHTML = `<div class="empty">
+      <div class="big">[ 0x00 ]</div>
+      <div>KHÔNG_TÌM_THẤY_DỮ_LIỆU${q?' PHÙ_HỢP':''}</div>
+      <div style="font-size:12px;margin-top:8px;opacity:0.6">> Khởi tạo prompt mới để bắt đầu.</div>
+    </div>`;
+    return;
+  }
+  grid.innerHTML = list.map(p=>{
+    const folder = state.folders.find(f=>f.id===p.folderId);
+    const contentHtml = linkify(escapeHtml(p.content));
+    return `<div class="prompt-card">
+      <div class="prompt-title">
+        ${escapeHtml(p.name)}
+        ${folder?`<span class="folder-badge">${escapeHtml(folder.name)}</span>`:''}
+      </div>
+      <div class="prompt-content">${contentHtml}</div>
+      <div class="prompt-tags">
+        ${(p.tags||[]).map(t=>`<span class="prompt-tag">${escapeHtml(t)}</span>`).join('')}
+      </div>
+      <div class="prompt-actions">
+        <button class="icon-btn copy" onclick="copyPrompt('${p.id}')">[ SAO_CHÉP ]</button>
+        <button class="icon-btn" onclick="editPrompt('${p.id}')">[ CHỈNH_SỬA ]</button>
+        <button class="icon-btn del" onclick="deletePrompt('${p.id}')">[ XÓA ]</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ============ UTILS ============ */
+function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function escapeAttr(s){return escapeHtml(s).replace(/'/g,"\\'")}
+function linkify(text){
+  return text.replace(/(https?:\/\/[^\s<]+)/g, (m)=>{
+    const clean = m.replace(/&amp;/g,'&');
+    return `<a href='${clean}' target="_blank" rel="nofollow">${clean}</a>`;
+  });
+}
+function toast(msg, type='success'){
+  const t = document.getElementById('toast');
+  t.textContent = `> ${msg}`;
+  t.className = 'toast show' + (type==='error'?' error':'');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+/* ============ ACTIONS ============ */
+function selectFolder(id){state.activeFolder=id;state.activeTag=null;render()}
+function filterTag(t){state.activeTag=t;render()}
+
+function openFolderModal(){
+  document.getElementById('fName').value='';
+  openModal('folderModal');
+  setTimeout(()=>document.getElementById('fName').focus(),50);
+}
+function saveFolder(){
+  const name = document.getElementById('fName').value.trim();
+  if(!name){toast('THIẾU_TÊN_THƯ_MỤC','error');return}
+  state.folders.push({id:uid(), name});
+  save();render();closeModal('folderModal');
+  toast('ĐÃ_TẠO_THƯ_MỤC');
+}
+function deleteFolder(id){
+  const count = state.prompts.filter(p=>p.folderId===id).length;
+  if(!confirm(`XÁC_NHẬN_XÓA_THƯ_MỤC?${count?` (${count} prompt sẽ chuyển về trạng thái không phân loại)`:''}`))return;
+  state.folders = state.folders.filter(f=>f.id!==id);
+  state.prompts.forEach(p=>{if(p.folderId===id)p.folderId=''});
+  if(state.activeFolder===id)state.activeFolder='all';
+  save();render();
+}
+
+function openPromptModal(){
+  state.editingId = null;
+  document.getElementById('promptModalTitle').textContent = 'KHỞI_TẠO_PROMPT';
+  document.getElementById('pName').value='';
+  document.getElementById('pContent').value='';
+  document.getElementById('pTags').value='';
+  const sel = document.getElementById('pFolder');
+  sel.innerHTML = `<option value="">-- KHÔNG_CHỌN --</option>` +
+    state.folders.map(f=>`<option value="${f.id}" ${f.id===state.activeFolder&&state.activeFolder!=='all'?'selected':''}>${escapeHtml(f.name)}</option>`).join('');
+  openModal('promptModal');
+  setTimeout(()=>document.getElementById('pName').focus(),50);
+}
+function editPrompt(id){
+  const p = state.prompts.find(x=>x.id===id);if(!p)return;
+  state.editingId = id;
+  document.getElementById('promptModalTitle').textContent = 'CẬP_NHẬT_PROMPT';
+  document.getElementById('pName').value = p.name;
+  document.getElementById('pContent').value = p.content;
+  document.getElementById('pTags').value = (p.tags||[]).join(', ');
+  const sel = document.getElementById('pFolder');
+  sel.innerHTML = `<option value="">-- KHÔNG_CHỌN --</option>` +
+    state.folders.map(f=>`<option value="${f.id}" ${f.id===p.folderId?'selected':''}>${escapeHtml(f.name)}</option>`).join('');
+  openModal('promptModal');
+}
+function savePrompt(){
+  const name = document.getElementById('pName').value.trim();
+  const content = document.getElementById('pContent').value;
+  const folderId = document.getElementById('pFolder').value;
+  const tags = document.getElementById('pTags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  if(!name){toast('THIẾU_TÊN_PROMPT','error');return}
+  if(!content.trim()){toast('THIẾU_NỘI_DUNG','error');return}
+  if(state.editingId){
+    const p = state.prompts.find(x=>x.id===state.editingId);
+    Object.assign(p,{name,content,folderId,tags,updatedAt:Date.now()});
+    toast('ĐÃ_CẬP_NHẬT_DỮ_LIỆU');
+  }else{
+    state.prompts.push({id:uid(),name,content,folderId,tags,createdAt:Date.now(),updatedAt:Date.now()});
+    toast('ĐÃ_LƯU_PROMPT');
+  }
+  save();render();closeModal('promptModal');
+}
+function deletePrompt(id){
+  if(!confirm('XÁC_NHẬN_XÓA_PROMPT_NÀY?'))return;
+  state.prompts = state.prompts.filter(p=>p.id!==id);
+  save();render();toast('ĐÃ_XÓA_DỮ_LIỆU');
+}
+function copyPrompt(id){
+  const p = state.prompts.find(x=>x.id===id);if(!p)return;
+  navigator.clipboard.writeText(p.content).then(()=>toast('ĐÃ_SAO_CHÉP_VÀO_CLIPBOARD'));
+}
+
+/* ============ MODAL ============ */
+function openModal(id){document.getElementById(id).classList.add('show')}
+function closeModal(id){document.getElementById(id).classList.remove('show')}
+document.querySelectorAll('.modal-backdrop').forEach(m=>{
+  m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show')});
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')document.querySelectorAll('.modal-backdrop.show').forEach(m=>m.classList.remove('show'));
+});
+
+/* ============ IMPORT / EXPORT ============ */
+function exportData(){
+  const data = {
+    version:1,
+    exportedAt:new Date().toISOString(),
+    folders:state.folders,
+    prompts:state.prompts
+  };
+  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `prompt_vault_backup_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('ĐÃ_XUẤT_FILE_JSON');
+}
+function importData(e){
+  const file = e.target.files[0];if(!file)return;
+  const reader = new FileReader();
+  reader.onload = ev=>{
+    try{
+      const d = JSON.parse(ev.target.result);
+      if(!d.folders||!d.prompts)throw new Error('ĐỊNH_DẠNG_KHÔNG_HỢP_LỆ');
+      if(!confirm(`XÁC_NHẬN_NHẬP_DỮ_LIỆU?\n(${d.folders.length} thư mục, ${d.prompts.length} prompt)\nDữ liệu hiện tại sẽ bị ghi đè.`))return;
+      state.folders = d.folders;
+      state.prompts = d.prompts;
+      state.activeFolder='all';state.activeTag=null;
+      save();render();
+      toast('ĐÃ_NHẬP_DỮ_LIỆU_THÀNH_CÔNG');
+    }catch(err){toast('LỖI: '+err.message,'error')}
+  };
+  reader.readAsText(file);
+  e.target.value='';
+}
+
+/* ============ INIT ============ */
+load();
+render();
+</script>
+</body>
+</html>
